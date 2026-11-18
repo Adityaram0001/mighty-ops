@@ -16,13 +16,23 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: ubuntu-latest, python: "3.9" }
           - { os: ubuntu-latest, python: "3.13" }
           - { os: macos-latest, python: "3.13" }
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
+      - name: Run tests (stdlib unittest)
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+  # Oldest supported Python. Hosted runners no longer ship 3.9, so use the
+  # official image (it includes git, which the tests need).
+  unittest-min:
+    name: python 3.9 (container)
+    runs-on: ubuntu-latest
+    container: python:3.9
+    steps:
+      - uses: actions/checkout@v5
       - name: Run tests (stdlib unittest)
         run: python -m unittest discover -s tests -p 'test_*.py' -v
